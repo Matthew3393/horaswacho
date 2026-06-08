@@ -3,32 +3,29 @@ const SUPABASE_URL = 'https://vchntmdlfvmzoapdfasn.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_klrBgqz11NEB3zChxsp4Ug_bSSCAb-N';
 
 let entries = [];
+let gastosEntries = [];
 
-const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-async function fetchHoras() {
+async function fetchData() {
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/horas`, {
-            headers: {
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`
-            }
-        });
-        if (!response.ok) {
-            // Error silently if table doesn't exist yet so it doesn't break everything visually
-            console.error('Error al obtener datos o la tabla no existe.');
-            return;
+        const [horasRes, gastosRes] = await Promise.all([
+            fetch(`${SUPABASE_URL}/rest/v1/horas`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }),
+            fetch(`${SUPABASE_URL}/rest/v1/gastos`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } })
+        ]);
+        
+        if (horasRes.ok) {
+            const data = await horasRes.json();
+            entries = data.map(d => ({
+                id: d.id, date: d.date, start: d.start_time, end: d.end_time, hours: parseFloat(d.hours), obs: d.obs || '-'
+            }));
         }
-        const data = await response.json();
-        entries = data.map(d => ({
-            id: d.id,
-            date: d.date,
-            start: d.start_time,
-            end: d.end_time,
-            hours: parseFloat(d.hours),
-            obs: d.obs || '-'
-        }));
+        
+        if (gastosRes.ok) {
+            const gData = await gastosRes.json();
+            gastosEntries = gData.map(g => ({
+                id: g.id, date: g.date, amount: parseFloat(g.amount), description: g.description
+            }));
+        }
+        
         render();
     } catch (error) {
         console.error("Error fetching data:", error);
@@ -54,10 +51,34 @@ async function addHoraToDB(entry) {
             })
         });
         if (!response.ok) throw new Error('Error al guardar datos');
-        await fetchHoras();
+        await fetchData();
     } catch (error) {
         console.error("Error guardando dato:", error);
-        alert("Hubo un error al guardar. Asegurate de haber corrido el código SQL en Supabase para crear la tabla.");
+        alert("Hubo un error al guardar.");
+    }
+}
+
+async function addGastoToDB(gasto) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/gastos`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+                date: gasto.date,
+                amount: gasto.amount,
+                description: gasto.description
+            })
+        });
+        if (!response.ok) throw new Error('Error al guardar gasto');
+        await fetchData();
+    } catch (error) {
+        console.error("Error guardando gasto:", error);
+        alert("Hubo un error al guardar el gasto.");
     }
 }
 
@@ -72,9 +93,26 @@ async function deleteHoraFromDB(id) {
             }
         });
         if (!response.ok) throw new Error('Error al eliminar datos');
-        await fetchHoras();
+        await fetchData();
     } catch (error) {
         console.error("Error eliminando dato:", error);
+    }
+}
+
+async function deleteGastoFromDB(id) {
+    if(!confirm("¿Eliminar este gasto?")) return;
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/gastos?id=eq.${id}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        if (!response.ok) throw new Error('Error al eliminar gasto');
+        await fetchData();
+    } catch (error) {
+        console.error("Error eliminando gasto:", error);
     }
 }
 
@@ -88,9 +126,10 @@ function getDayName(dateStr) {
     return daysOfWeek[d.getDay()];
 }
 
-function groupIntoQuincenas(data) {
+function groupIntoQuincenas(data, gastosData) {
     const groups = {};
     
+    // Group horas
     data.forEach(entry => {
         const d = new Date(entry.date + "T12:00:00");
         const month = d.getMonth() + 1;
@@ -113,15 +152,39 @@ function groupIntoQuincenas(data) {
         }
         
         if (!groups[key]) {
-            groups[key] = {
-                id: key,
-                label: label,
-                entries: [],
-                totalHours: 0
-            };
+            groups[key] = { id: key, label: label, entries: [], gastos: [], totalHours: 0, totalGastos: 0 };
         }
         groups[key].entries.push(entry);
         groups[key].totalHours += entry.hours;
+    });
+
+    // Group gastos
+    gastosData.forEach(gasto => {
+        const d = new Date(gasto.date + "T12:00:00");
+        const month = d.getMonth() + 1;
+        const year = d.getFullYear();
+        const day = d.getDate();
+        
+        let key = '';
+        let label = '';
+        
+        if (gasto.date <= '2026-05-31') {
+            key = '0000-01';
+            label = '1ª Quincena';
+        } else if (gasto.date >= '2026-06-01' && gasto.date <= '2026-06-15') {
+            key = '0000-02';
+            label = '2ª Quincena';
+        } else {
+            let q = day <= 15 ? 1 : 2;
+            key = `${year}-${month.toString().padStart(2, '0')}-Q${q}`;
+            label = `${q}ª Quincena | Mes ${month}`;
+        }
+        
+        if (!groups[key]) {
+            groups[key] = { id: key, label: label, entries: [], gastos: [], totalHours: 0, totalGastos: 0 };
+        }
+        groups[key].gastos.push(gasto);
+        groups[key].totalGastos += gasto.amount;
     });
 
     return Object.values(groups).sort((a, b) => a.id.localeCompare(b.id));
@@ -132,7 +195,8 @@ function render() {
     container.innerHTML = '';
     
     const sortedEntries = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
-    const quincenas = groupIntoQuincenas(sortedEntries);
+    const sortedGastos = [...gastosEntries].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const quincenas = groupIntoQuincenas(sortedEntries, sortedGastos);
     
     // Group quincenas into Months
     const monthsData = {};
@@ -158,12 +222,14 @@ function render() {
                 id: monthKey,
                 label: monthLabel,
                 quincenas: [],
-                totalHours: 0
+                totalHours: 0,
+                totalGastos: 0
             };
         }
         
         monthsData[monthKey].quincenas.push(q);
         monthsData[monthKey].totalHours += q.totalHours;
+        monthsData[monthKey].totalGastos += q.totalGastos;
     });
     
     const sortedMonths = Object.values(monthsData).sort((a, b) => a.id.localeCompare(b.id));
@@ -200,6 +266,28 @@ function render() {
                 `;
             });
 
+            let gastosHtml = '';
+            if (q.gastos && q.gastos.length > 0) {
+                let gRows = '';
+                q.gastos.forEach(g => {
+                    gRows += `
+                        <div class="gasto-item">
+                            <span>${formatDateDisplay(g.date)} - ${g.description}</span>
+                            <span class="gasto-monto text-red">-$${g.amount.toLocaleString('es-AR')}</span>
+                            <button class="btn-danger btn-sm" onclick="deleteGastoFromDB(${g.id})" style="padding: 2px 6px;">✕</button>
+                        </div>
+                    `;
+                });
+                gastosHtml = `
+                    <details class="gastos-details">
+                        <summary>Ver Gastos de la Quincena (-$${q.totalGastos.toLocaleString('es-AR')})</summary>
+                        <div class="gastos-list">
+                            ${gRows}
+                        </div>
+                    </details>
+                `;
+            }
+
             monthHtml += `
                 <div class="table-wrapper">
                     <div class="period-header">
@@ -229,18 +317,32 @@ function render() {
                             </tr>
                         </tbody>
                     </table>
+                    ${gastosHtml}
                 </div>
             `;
         });
         
         // Add Month Total
-        const monthMoney = m.totalHours * RATE;
+        const monthBruto = m.totalHours * RATE;
+        const monthNeto = monthBruto - m.totalGastos;
+        
         monthHtml += `
             <div class="month-total-wrapper">
                 <div class="month-total-label">Cierre del Mes</div>
-                <div style="text-align: right;">
-                    <div class="month-total-value">${m.totalHours} hrs</div>
-                    <div class="month-total-money">$${monthMoney.toLocaleString('es-AR')}</div>
+                <div style="text-align: right; width: 60%; min-width: 250px;">
+                    <div class="receipt-row">
+                        <span>Ingresos Brutos:</span>
+                        <span>$${monthBruto.toLocaleString('es-AR')}</span>
+                    </div>
+                    <div class="receipt-row text-red">
+                        <span>Gastos (Bondi, etc):</span>
+                        <span>-$${m.totalGastos.toLocaleString('es-AR')}</span>
+                    </div>
+                    <div class="receipt-divider"></div>
+                    <div class="receipt-row neto-row">
+                        <span>Ganancia Neta:</span>
+                        <span class="money-value">$${monthNeto.toLocaleString('es-AR')}</span>
+                    </div>
                 </div>
             </div>
         </div>`;
@@ -301,5 +403,46 @@ form.addEventListener('submit', async (e) => {
     btnSubmit.disabled = false;
 });
 
+// Modal Expense Logic
+const modalExpense = document.getElementById('modalExpenseAdd');
+const formExpense = document.getElementById('addExpenseForm');
+
+function openExpenseModal() {
+    document.getElementById('inputExpenseDate').valueAsDate = new Date();
+    modalExpense.classList.add('active');
+}
+
+document.getElementById('btnCloseExpenseModal').addEventListener('click', () => {
+    modalExpense.classList.remove('active');
+});
+
+modalExpense.addEventListener('click', (e) => {
+    if (e.target === modalExpense) modalExpense.classList.remove('active');
+});
+
+formExpense.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const btnSubmit = formExpense.querySelector('button[type="submit"]');
+    const originalText = btnSubmit.textContent;
+    btnSubmit.textContent = "Guardando...";
+    btnSubmit.disabled = true;
+
+    const date = document.getElementById('inputExpenseDate').value;
+    const desc = document.getElementById('inputExpenseDesc').value;
+    const amount = document.getElementById('inputExpenseAmount').value;
+
+    await addGastoToDB({
+        date: date,
+        description: desc,
+        amount: parseFloat(amount)
+    });
+    
+    modalExpense.classList.remove('active');
+    formExpense.reset();
+    btnSubmit.textContent = originalText;
+    btnSubmit.disabled = false;
+});
+
 // Init
-fetchHoras();
+fetchData();

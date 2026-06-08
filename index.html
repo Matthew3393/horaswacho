@@ -21,10 +21,13 @@
             </h1>
             <p class="subtitle">Mateo GM</p>
         </div>
-        <button class="btn" id="btnAddHours">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Cargar Horas
-        </button>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn" id="btnAddExpense" onclick="openExpenseModal()">Cargar Gasto</button>
+            <button class="btn" id="btnAddHours">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Cargar Horas
+            </button>
+        </div>
     </div>
 
     <div id="table-container">
@@ -64,6 +67,31 @@
             </div>
 
             <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;">Guardar Horas</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal for adding expenses -->
+<div class="modal-overlay" id="modalExpenseAdd" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Cargar Nuevo Gasto</h2>
+            <button class="close-btn" id="btnCloseExpenseModal">&times;</button>
+        </div>
+        <form id="addExpenseForm">
+            <div class="form-group">
+                <label>Fecha</label>
+                <input type="date" id="inputExpenseDate" required>
+            </div>
+            <div class="form-group">
+                <label>Motivo (Ej: Pasaje Bondi)</label>
+                <input type="text" id="inputExpenseDesc" required>
+            </div>
+            <div class="form-group">
+                <label>Monto ($)</label>
+                <input type="number" id="inputExpenseAmount" min="1" required>
+            </div>
+            <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px; background-color: #ef4444;">Guardar Gasto</button>
         </form>
     </div>
 </div>

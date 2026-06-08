@@ -285,6 +285,89 @@ tr:hover td { background-color: var(--row-hover); }
 .month-total-value { font-size: 32px; font-weight: 700; color: #2dd4bf; }
 .month-total-money { color: var(--money-color); font-size: 26px; font-weight: 700; margin-top: 8px; }
 
+/* Gastos & Receipt Styles */
+.text-red { color: #ef4444 !important; }
+.btn-sm { font-size: 12px; padding: 4px 8px; }
+
+.gastos-details {
+    margin-top: 15px;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.gastos-details summary {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #ef4444;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+}
+
+.gastos-details summary::-webkit-details-marker {
+    display: none;
+}
+
+.gastos-details summary::after {
+    content: '▼';
+    font-size: 12px;
+    transition: transform 0.2s;
+}
+
+.gastos-details[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.gastos-list {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.gasto-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+}
+
+.gasto-item:last-child {
+    border-bottom: none;
+}
+
+.gasto-monto {
+    font-weight: 600;
+    margin-right: 15px;
+    margin-left: auto;
+}
+
+.receipt-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    margin-bottom: 6px;
+    color: var(--text-main);
+}
+
+.receipt-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 12px 0;
+}
+
+.neto-row {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.neto-row .money-value {
+    color: var(--money-color);
+}
+
 /* Mobile Optimizations */
 @media (max-width: 768px) {
     th, td { padding: 12px 16px; }
