@@ -253,21 +253,31 @@ function render() {
             const money = q.totalHours * RATE;
 
             let rowsHtml = '';
-            q.entries.forEach((e, i) => {
-                rowsHtml += `
+            if (q.entries.length === 0) {
+                rowsHtml = `
                     <tr>
-                        <td class="col-id">${i + 1}</td>
-                        <td class="col-date">${formatDateDisplay(e.date)}</td>
-                        <td class="col-day">${getDayName(e.date)}</td>
-                        <td class="col-schedule">${e.start} - ${e.end}</td>
-                        <td class="col-hours">${e.hours}</td>
-                        <td class="col-obs">${e.obs || '-'}</td>
-                        <td class="col-actions">
-                            <button class="btn-danger" onclick="deleteHoraFromDB(${e.id})" title="Eliminar">✕</button>
+                        <td colspan="7" class="empty-state-row">
+                            Sin horas registradas en esta quincena
                         </td>
                     </tr>
                 `;
-            });
+            } else {
+                q.entries.forEach((e, i) => {
+                    rowsHtml += `
+                        <tr>
+                            <td class="col-id">${i + 1}</td>
+                            <td class="col-date">${formatDateDisplay(e.date)}</td>
+                            <td class="col-day">${getDayName(e.date)}</td>
+                            <td class="col-schedule">${e.start} - ${e.end}</td>
+                            <td class="col-hours">${e.hours}</td>
+                            <td class="col-obs">${e.obs || '-'}</td>
+                            <td class="col-actions">
+                                <button class="btn-danger" onclick="deleteHoraFromDB(${e.id})" title="Eliminar">✕</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
 
             let gastosHtml = '';
             if (q.gastos && q.gastos.length > 0) {
