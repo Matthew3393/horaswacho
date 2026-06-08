@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Horas | Mateo GM</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- PWA settings -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>
+                Registro de Horas
+                <span class="rate-badge">Tarifa: $<span id="hourly-rate">4100</span> / h</span>
+            </h1>
+            <p class="subtitle">Mateo GM</p>
+        </div>
+        <button class="btn" id="btnAddHours">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Cargar Horas
+        </button>
+    </div>
+
+    <div id="table-container">
+        <!-- Tables will be injected here by app.js -->
+    </div>
+
+    <!-- Totals are now handled dynamically per month in app.js -->
+</div>
+
+<!-- Modal for adding hours -->
+<div class="modal-overlay" id="modalAdd">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Cargar Horas</h2>
+            <button class="close-btn" id="btnCloseModal">&times;</button>
+        </div>
+        <form id="addHoursForm">
+            <div class="form-group">
+                <label>Fecha</label>
+                <input type="date" id="inputDate" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Hora Inicio</label>
+                    <input type="time" id="inputStart" value="14:00" required>
+                </div>
+                <div class="form-group">
+                    <label>Hora Fin</label>
+                    <input type="time" id="inputEnd" value="18:00" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Observaciones (opcional)</label>
+                <input type="text" id="inputObs" placeholder="Ej: Excepción 5hs">
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;">Guardar Horas</button>
+        </form>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
