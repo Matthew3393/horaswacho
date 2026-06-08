@@ -312,10 +312,14 @@ function render() {
                         <tbody>
                             ${rowsHtml}
                             <tr class="subtotal-row">
-                                <td colspan="4" class="subtotal-label">Subtotal ${label}:</td>
-                                <td colspan="3">
-                                    <span class="subtotal-value">${q.totalHours} hrs</span>
-                                    <span class="money-value">$${money.toLocaleString('es-AR')}</span>
+                                <td colspan="7">
+                                    <div class="subtotal-container">
+                                        <span class="subtotal-label">Subtotal ${label}:</span>
+                                        <div class="subtotal-right">
+                                            <span class="subtotal-value">${q.totalHours} hrs</span>
+                                            <span class="subtotal-money">$${money.toLocaleString('es-AR')}</span>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
