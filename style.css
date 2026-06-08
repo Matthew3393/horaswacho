@@ -73,12 +73,12 @@ p.subtitle {
     background-color: var(--primary);
     color: white;
     border: none;
-    padding: 12px 20px;
+    padding: 10px 18px;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -86,24 +86,50 @@ p.subtitle {
 
 .btn:hover {
     background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--text-muted);
 }
 
 .btn-danger {
     background-color: transparent;
-    color: var(--danger);
-    padding: 8px;
+    color: var(--text-muted);
+    padding: 6px 10px;
     border-radius: 6px;
-    border: 1px solid var(--danger);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 .btn-danger:hover {
-    background-color: rgba(239, 68, 68, 0.1);
+    background-color: rgba(239, 68, 68, 0.15);
+    color: var(--danger);
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
 }
 
 /* Modal */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -121,10 +147,11 @@ p.subtitle {
 .modal-content {
     background-color: var(--card-bg);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
+    border-radius: 16px;
+    padding: 28px;
     width: 100%;
     max-width: 400px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     transform: translateY(20px);
     transition: transform 0.3s ease;
 }
@@ -143,6 +170,7 @@ p.subtitle {
 .modal-header h2 {
     margin: 0;
     font-size: 20px;
+    font-weight: 700;
 }
 
 .close-btn {
@@ -151,16 +179,22 @@ p.subtitle {
     color: var(--text-muted);
     font-size: 24px;
     cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+    color: var(--text-main);
 }
 
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 6px;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--text-muted);
 }
 
@@ -169,10 +203,17 @@ p.subtitle {
     background-color: var(--bg-color);
     border: 1px solid var(--border);
     color: white;
-    padding: 10px 12px;
-    border-radius: 6px;
+    padding: 10px 14px;
+    border-radius: 8px;
     font-size: 15px;
     font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .form-row {
@@ -188,6 +229,37 @@ p.subtitle {
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     margin-bottom: 30px;
+}
+
+.period-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.status-badge.status-open {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+.status-badge.status-closed {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 table {
@@ -215,6 +287,12 @@ td {
 
 tr:last-child td { border-bottom: none; }
 tr:hover td { background-color: var(--row-hover); }
+
+.col-id {
+    color: var(--text-muted);
+    font-weight: 500;
+    width: 50px;
+}
 
 .col-date { font-weight: 500; }
 .col-day { color: var(--text-muted); }
@@ -370,9 +448,50 @@ tr:hover td { background-color: var(--row-hover); }
 
 /* Mobile Optimizations */
 @media (max-width: 768px) {
-    th, td { padding: 12px 16px; }
-    .col-obs, .col-day { display: none; } /* Hide some columns on very small screens */
-    .rate-badge { display: block; margin-left: 0; margin-top: 10px; width: fit-content; }
-    h1 { font-size: 24px; }
-    .btn { width: 100%; justify-content: center; }
+    body {
+        padding: 12px;
+    }
+    .header {
+        margin-bottom: 20px;
+    }
+    .header-actions {
+        width: 100%;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    th, td {
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+    .col-obs, .col-day {
+        display: none;
+    }
+    .rate-badge {
+        display: inline-block;
+        margin-top: 4px;
+        font-size: 12px;
+    }
+    .month-title {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    .month-total-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 16px;
+    }
+    .month-total-wrapper > div {
+        width: 100% !important;
+    }
+    .receipt-row {
+        font-size: 15px;
+    }
+    .neto-row {
+        font-size: 20px;
+    }
 }

@@ -9,22 +9,30 @@
     <!-- PWA settings -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <div class="container">
     <div class="header">
         <div>
-            <h1>
-                Registro de Horas
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <h1>Registro de Horas</h1>
                 <span class="rate-badge">Tarifa: $<span id="hourly-rate">4100</span> / h</span>
-            </h1>
+            </div>
             <p class="subtitle">Mateo GM</p>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn" id="btnAddExpense" onclick="openExpenseModal()">Cargar Gasto</button>
+        <div class="header-actions">
+            <button class="btn btn-secondary" id="btnAddExpense" onclick="openExpenseModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                Cargar Gasto
+            </button>
             <button class="btn" id="btnAddHours">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Cargar Horas
             </button>
         </div>
