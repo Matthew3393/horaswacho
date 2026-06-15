@@ -536,6 +536,13 @@ tr:hover td { background-color: var(--row-hover); }
     }
 }
 
+.date-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
 .badge-holiday {
     display: inline-block;
     background-color: rgba(245, 158, 11, 0.1);
@@ -545,8 +552,6 @@ tr:hover td { background-color: var(--row-hover); }
     font-weight: 700;
     padding: 2px 6px;
     border-radius: 4px;
-    margin-left: 8px;
-    vertical-align: middle;
     text-transform: uppercase;
 }
 

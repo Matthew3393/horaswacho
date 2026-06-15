@@ -290,8 +290,10 @@ function render() {
                         <tr>
                             <td class="col-id">${i + 1}</td>
                             <td class="col-date">
-                                ${formatDateDisplay(e.date)}
-                                ${isCustom ? '<span class="badge-holiday">Feriado</span>' : ''}
+                                <div class="date-container">
+                                    <span>${formatDateDisplay(e.date)}</span>
+                                    ${isCustom ? '<span class="badge-holiday">Feriado</span>' : ''}
+                                </div>
                             </td>
                             <td class="col-day">${getDayName(e.date)}</td>
                             <td class="col-schedule">${e.start} - ${e.end}</td>
