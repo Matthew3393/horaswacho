@@ -155,10 +155,19 @@ function groupIntoQuincenas(data, gastosData) {
         }
         
         if (!groups[key]) {
-            groups[key] = { id: key, label: label, entries: [], gastos: [], totalHours: 0, totalGastos: 0 };
+            groups[key] = { id: key, label: label, entries: [], gastos: [], totalHours: 0, totalGastos: 0, totalMoney: 0 };
         }
         groups[key].entries.push(entry);
         groups[key].totalHours += entry.hours;
+        
+        let entryRate = RATE;
+        if (entry.obs && entry.obs.includes('$')) {
+            const match = entry.obs.match(/\$(\d+)/);
+            if (match) {
+                entryRate = parseInt(match[1], 10);
+            }
+        }
+        groups[key].totalMoney += entry.hours * entryRate;
     });
 
     // Group gastos
@@ -184,7 +193,7 @@ function groupIntoQuincenas(data, gastosData) {
         }
         
         if (!groups[key]) {
-            groups[key] = { id: key, label: label, entries: [], gastos: [], totalHours: 0, totalGastos: 0 };
+            groups[key] = { id: key, label: label, entries: [], gastos: [], totalHours: 0, totalGastos: 0, totalMoney: 0 };
         }
         groups[key].gastos.push(gasto);
         groups[key].totalGastos += gasto.amount;
@@ -226,13 +235,15 @@ function render() {
                 label: monthLabel,
                 quincenas: [],
                 totalHours: 0,
-                totalGastos: 0
+                totalGastos: 0,
+                totalMoney: 0
             };
         }
         
         monthsData[monthKey].quincenas.push(q);
         monthsData[monthKey].totalHours += q.totalHours;
         monthsData[monthKey].totalGastos += q.totalGastos;
+        monthsData[monthKey].totalMoney += q.totalMoney;
     });
     
     const sortedMonths = Object.values(monthsData).sort((a, b) => a.id.localeCompare(b.id));
@@ -250,7 +261,7 @@ function render() {
                 statusText = "Cerrada – A Cobrar";
             }
 
-            const money = q.totalHours * RATE;
+            const money = q.totalMoney;
 
             let rowsHtml = '';
             if (q.entries.length === 0) {
@@ -340,7 +351,7 @@ function render() {
         });
         
         // Add Month Total
-        const monthBruto = m.totalHours * RATE;
+        const monthBruto = m.totalMoney;
         const monthNeto = monthBruto - m.totalGastos;
         
         monthHtml += `
