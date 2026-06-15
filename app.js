@@ -274,13 +274,31 @@ function render() {
                 `;
             } else {
                 q.entries.forEach((e, i) => {
+                    let entryRate = RATE;
+                    let isCustom = false;
+                    if (e.obs && e.obs.includes('$')) {
+                        const match = e.obs.match(/\$(\d+)/);
+                        if (match) {
+                            entryRate = parseInt(match[1], 10);
+                            isCustom = true;
+                        }
+                    }
+                    
+                    const rateIndicator = isCustom ? `<span class="custom-rate-indicator">$${entryRate.toLocaleString('es-AR')}/h</span>` : '';
+                    
                     rowsHtml += `
                         <tr>
                             <td class="col-id">${i + 1}</td>
-                            <td class="col-date">${formatDateDisplay(e.date)}</td>
+                            <td class="col-date">
+                                ${formatDateDisplay(e.date)}
+                                ${isCustom ? '<span class="badge-holiday">Feriado</span>' : ''}
+                            </td>
                             <td class="col-day">${getDayName(e.date)}</td>
                             <td class="col-schedule">${e.start} - ${e.end}</td>
-                            <td class="col-hours">${e.hours}</td>
+                            <td class="col-hours">
+                                ${e.hours}
+                                ${rateIndicator}
+                            </td>
                             <td class="col-obs">${e.obs || '-'}</td>
                             <td class="col-actions">
                                 <button class="btn-danger" onclick="deleteHoraFromDB(${e.id})" title="Eliminar">✕</button>
