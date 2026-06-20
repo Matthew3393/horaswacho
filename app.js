@@ -286,17 +286,22 @@ function render() {
                     
                     const rateIndicator = isCustom ? `<span class="custom-rate-indicator">$${entryRate.toLocaleString('es-AR')}/h</span>` : '';
                     
+                    const isSick = e.obs === 'ENFERMO';
+                    const sickBadge = isSick ? '<span class="badge-sick">Enfermo</span>' : '';
+                    const rowClass = isSick ? 'class="row-enfermo"' : '';
+
                     rowsHtml += `
-                        <tr>
+                        <tr ${rowClass}>
                             <td class="col-id">${i + 1}</td>
                             <td class="col-date">
                                 <div class="date-container">
                                     <span>${formatDateDisplay(e.date)}</span>
                                     ${isCustom ? '<span class="badge-holiday">Feriado</span>' : ''}
+                                    ${sickBadge}
                                 </div>
                             </td>
                             <td class="col-day">${getDayName(e.date)}</td>
-                            <td class="col-schedule">${e.start} - ${e.end}</td>
+                            <td class="col-schedule">${isSick ? '-' : `${e.start} - ${e.end}`}</td>
                             <td class="col-hours">
                                 ${e.hours}
                                 ${rateIndicator}
